@@ -10,13 +10,13 @@ import java.sql.SQLException;
 
 public class AdminPanel {
 
-    private JFrame frame;
+    private JFrame frame; // Main window frame
     private JTextField busIdfield, busNoField, bustypeField, totalSeatsfield, availableSeatsField, depCityField, arrCityField, depTimeField, arrTimeField, farefield, deletionIDfield;
-    private JTable busTable, userTable, reservationTable;
+    private JTable busTable, userTable, reservationTable; // Tables for displaying data
 
     AdminPanel() {
         try {
-            UIManager.setLookAndFeel(new NimbusLookAndFeel()); // Modern UI Look
+            UIManager.setLookAndFeel(new NimbusLookAndFeel()); // Set modern UI Look
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -24,9 +24,9 @@ public class AdminPanel {
         frame = new JFrame("Admin Panel");
         frame.setSize(900, 650);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout(10, 10));
+        frame.setLayout(new BorderLayout(10, 10)); // Set layout with spacing
 
-        // Header Panel
+        // Header Panel with gradient background
         JPanel headerPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -45,30 +45,33 @@ public class AdminPanel {
         headerLabel.setFont(new Font("Arial", Font.BOLD, 28));
         headerLabel.setForeground(Color.WHITE);
 
-        JLabel adminAvatar = new JLabel(new ImageIcon("icons/admin.png")); // Add admin avatar icon
+        ImageIcon adminIcon = new ImageIcon("icons/admin.png");
+        Image scaledAdminIcon = adminIcon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+        JLabel adminAvatar = new JLabel(new ImageIcon(scaledAdminIcon));
         headerPanel.add(adminAvatar);
         headerPanel.add(headerLabel);
 
         frame.add(headerPanel, BorderLayout.NORTH);
 
-        // Delete Panel
+        // Panel for deleting entries
         JPanel deletePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         deletePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), "Delete Entry", TitledBorder.LEADING, TitledBorder.TOP, new Font("Arial", Font.BOLD, 16)));
 
-        JComboBox<String> tablesComboBox = new JComboBox<>(new String[]{"Bus", "User", "Reservation"});
+        JComboBox<String> tablesComboBox = new JComboBox<>(new String[]{"Bus", "User", "Reservation"}); // Dropdown for table selection
         deletionIDfield = new JTextField(10);
 
         JButton deleteButton = new JButton("Delete");
-        deleteButton.setBackground(new Color(255, 99, 71));
+        deleteButton.setBackground(new Color(255, 99, 71)); // Red color
         deleteButton.setForeground(Color.WHITE);
 
+        // Delete button action listener
         deleteButton.addActionListener(e -> {
             int result = JOptionPane.showConfirmDialog(frame, "Are you sure you want to delete this entry?", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
                 try {
                     DatabaseOperations.delete((String) tablesComboBox.getSelectedItem(), Integer.parseInt(deletionIDfield.getText()));
                     JOptionPane.showMessageDialog(deleteButton, "Deleted Successfully");
-                    refreshTables();
+                    refreshTables(); // Refresh the tables after deletion
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(deleteButton, "Invalid ID or error in deletion");
                 }
@@ -80,28 +83,26 @@ public class AdminPanel {
         deletePanel.add(deleteButton);
         frame.add(deletePanel, BorderLayout.SOUTH);
 
-        // Tabbed Pane
+        // Tabbed pane for displaying tables
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Arial", Font.BOLD, 18));
 
-        // Bus Table
+        // Create bus, user, and reservation tables
         busTable = createStyledTable(new String[]{"ID", "No", "Type", "Total Seats", "Available", "Departure", "Arrival", "Dep Time", "Arr Time", "Fare"});
         JScrollPane busScrollPane = new JScrollPane(busTable);
-        tabbedPane.addTab("Buses", new ImageIcon("icons/bus-icon.png"), busScrollPane);
+        tabbedPane.addTab("Buses", resizeIcon("icons/bus-icon.png"), busScrollPane);
 
-        // Users Table
         userTable = createStyledTable(new String[]{"ID", "Name", "E-Mail", "Password", "Phone No", "Address"});
         JScrollPane userScrollPane = new JScrollPane(userTable);
-        tabbedPane.addTab("Users", new ImageIcon("icons/user-icon.png"), userScrollPane);
+        tabbedPane.addTab("Users", resizeIcon("icons/user-icon.png"), userScrollPane);
 
-        // Reservations Table
         reservationTable = createStyledTable(new String[]{"ID", "User ID", "Bus ID", "Seats", "Total Fare", "Date"});
         JScrollPane reservationScrollPane = new JScrollPane(reservationTable);
-        tabbedPane.addTab("Reservations", new ImageIcon("icons/reservation-icon.png"), reservationScrollPane);
+        tabbedPane.addTab("Reservations", resizeIcon("icons/reservation-icon.png"), reservationScrollPane);
 
         frame.add(tabbedPane, BorderLayout.CENTER);
 
-        // Add Bus Panel
+        // Panel for adding a bus
         JPanel busPanel = new JPanel(new GridBagLayout());
         busPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), "Add Bus", TitledBorder.LEADING, TitledBorder.TOP, new Font("Arial", Font.BOLD, 16)));
 
@@ -126,7 +127,7 @@ public class AdminPanel {
         }
 
         JButton addBusButton = new JButton("Add Bus");
-        addBusButton.setBackground(new Color(34, 139, 34));
+        addBusButton.setBackground(new Color(34, 139, 34)); // Green color
         addBusButton.setForeground(Color.WHITE);
         addBusButton.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Bus Added Successfully!"));
 
@@ -136,7 +137,7 @@ public class AdminPanel {
         gbc.anchor = GridBagConstraints.CENTER;
         busPanel.add(addBusButton, gbc);
 
-        tabbedPane.addTab("Add Bus", new ImageIcon("icons/add-bus-icon.png"), busPanel);
+        tabbedPane.addTab("Add Bus", resizeIcon("icons/add-bus-icon.png"), busPanel);
 
         frame.setVisible(true);
     }
@@ -147,17 +148,6 @@ public class AdminPanel {
         table.setRowHeight(30);
         table.setShowGrid(true);
         table.setGridColor(Color.LIGHT_GRAY);
-        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            {
-                setHorizontalAlignment(SwingConstants.CENTER);
-            }
-        });
-
-        JTableHeader header = table.getTableHeader();
-        header.setFont(new Font("Arial", Font.BOLD, 18));
-        header.setBackground(Color.DARK_GRAY);
-        header.setForeground(Color.WHITE);
-
         return table;
     }
 
@@ -170,4 +160,11 @@ public class AdminPanel {
             e1.printStackTrace();
         }
     }
+
+    private ImageIcon resizeIcon(String path) {
+        ImageIcon icon = new ImageIcon(path);
+        Image image = icon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+        return new ImageIcon(image);
+    }
+    
 }
