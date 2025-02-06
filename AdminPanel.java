@@ -45,7 +45,7 @@ public class AdminPanel {
         headerLabel.setFont(new Font("Arial", Font.BOLD, 28));
         headerLabel.setForeground(Color.WHITE);
 
-        ImageIcon adminIcon = new ImageIcon("icons/admin.png");
+        ImageIcon adminIcon = new ImageIcon("icons/admin-icon.png");
         Image scaledAdminIcon = adminIcon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
         JLabel adminAvatar = new JLabel(new ImageIcon(scaledAdminIcon));
         headerPanel.add(adminAvatar);
